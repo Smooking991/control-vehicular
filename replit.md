@@ -1,6 +1,6 @@
-# [Project name]
+# Control Vehicular
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Bitácora interna para una institución pública en Chile. Priorizar sencillez, estabilidad, trazabilidad y uso desde teléfonos Android; flota aproximada de ocho vehículos.
 
 ## Run & Operate
 
@@ -22,23 +22,34 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/control-vehicular`: aplicación React responsive.
+- `artifacts/api-server`: API privada, PIN y sesiones, reglas de kilometraje y avisos.
+- `lib/api-spec/openapi.yaml`: contrato compartido de la API.
+- `lib/db/src/schema/fleet.ts`: almacenamiento PostgreSQL.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- El usuario pidió expresamente autenticación local sencilla por PIN. No sustituir por OAuth sin pedirlo.
+- Serializar escrituras de la flota pequeña dentro de transacciones. El propósito es que dos registros simultáneos no puedan validar contra el mismo kilometraje antiguo.
+- Sin vehículos, conductores o credenciales ficticios en la base institucional. La primera apertura requiere crear Administración, luego registrar vehículos y conductores.
+- El correo se procesa después de confirmar el viaje. Un problema del proveedor nunca debe impedir guardar la bitácora. Usar una clave de idempotencia por ciclo de mantención y reintentos acotados dentro de la ventana de 24 horas del proveedor.
+- No reiniciar alertas al corregir un viaje: una mantención nueva inicia el nuevo ciclo, evitando avisos duplicados.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Viajes con fecha automática, validación de kilometraje, combustible, acompañantes y observaciones; administración de vehículos y conductores, mantenciones, historial con filtros, correcciones auditadas y resúmenes de combustible. Costos CLP, fechas America/Santiago.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+Mantener `vercel.json` en la raíz desde el principio con exactamente framework `vite`, outputDirectory `dist/public` y una única regla source `/(.*)` hacia `/index.html`.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- La configuración Vercel solicitada cubre SOLO la SPA. No despliega el servidor Express, PostgreSQL ni el proceso periódico de correo. No prometer que copiar solo `dist/public` habilita la aplicación completa. Un despliegue fuera de Replit requiere alojar también API y base de datos y conservar `/api` bajo el mismo origen.
+- Resend requiere conexión autorizada y remitente verificado; configurar remitente y destinatario en Administración. Sin conexión los avisos permanecen pendientes, nunca se marcan enviados.
+- PIN de 6 a 12 dígitos; no almacenar ni documentar PIN en texto plano.
+- Completar la configuración inicial antes de compartir la URL: el primer administrador reclama la instancia. No dejar la pantalla de configuración inicial expuesta públicamente.
+- Una notificación que agota reintentos queda `failed` para revisión operativa, sin reenvío automático fuera de la ventana de idempotencia.
 
 ## Pointers
 

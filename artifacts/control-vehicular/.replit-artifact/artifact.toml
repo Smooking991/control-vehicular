@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Control Vehicular"
+description = "Bitácora institucional de vehículos, viajes, combustible y mantenciones con acceso por PIN."
+version = "1.0.0"
+id = "artifacts/control-vehicular"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24500
+
+[services.development]
+run = "pnpm --filter @workspace/control-vehicular run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/control-vehicular", "run", "build" ]
+serve = "static"
+publicDir = "dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24500"
+BASE_PATH = "/"

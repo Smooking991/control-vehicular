@@ -1,36 +1,1233 @@
-openapi: 3.1.0
-info:
-  # Do not change the title, if the title changes, the import paths will be broken
-  title: Api
-  version: 0.1.0
-  description: API specification
-servers:
-  - url: /api
-    description: Base API path
-tags:
-  - name: health
-    description: Health operations
-paths:
-  /healthz:
-    get:
-      operationId: healthCheck
-      tags: [health]
-      summary: Health check
-      description: Returns server health status
-      responses:
-        "200":
-          description: Healthy
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HealthStatus"
-components:
-  schemas:
-    HealthStatus:
-      type: object
-      properties:
-        status:
-          type: string
-      required:
-        - status
-
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Api",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/session": {
+      "get": {
+        "operationId": "getSession",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/setup": {
+      "post": {
+        "operationId": "setupAdmin",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "operationId": "login",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drivers/public": {
+      "get": {
+        "operationId": "listPublicDrivers",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Driver"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "operationId": "getDashboard",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vehicles": {
+      "get": {
+        "operationId": "listVehicles",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Vehicle"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createVehicle",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vehicle"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drivers": {
+      "get": {
+        "operationId": "listDrivers",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Driver"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createDriver",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Driver"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trips": {
+      "get": {
+        "operationId": "listTrips",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Trip"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vehicleId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "driverId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "refueled",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "plate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createTrip",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trip"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/maintenances": {
+      "get": {
+        "operationId": "listMaintenances",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Maintenance"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createMaintenance",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Maintenance"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaintenanceInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vehicles/{id}": {
+      "put": {
+        "operationId": "updateVehicle",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vehicle"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/drivers/{id}": {
+      "put": {
+        "operationId": "updateDriver",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Driver"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriverInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/trips/{id}": {
+      "put": {
+        "operationId": "correctTrip",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trip"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/fuel": {
+      "get": {
+        "operationId": "getFuelSummary",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FuelSummary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vehicleId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "driverId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "refueled",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "plate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/audit": {
+      "get": {
+        "operationId": "listAudit",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Audit"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "operationId": "getSettings",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateSettings",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsInput"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "VehicleInput": {
+        "type": "object",
+        "properties": {
+          "plate": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "currentKm": {
+            "type": "number"
+          },
+          "lastMaintenanceKm": {
+            "type": "number"
+          },
+          "maintenanceInterval": {
+            "type": "number"
+          },
+          "nextMaintenanceKm": {
+            "type": "number"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "plate",
+          "brand",
+          "model",
+          "year",
+          "currentKm",
+          "lastMaintenanceKm",
+          "maintenanceInterval",
+          "nextMaintenanceKm",
+          "active"
+        ]
+      },
+      "DriverInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "pin": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "active"
+        ]
+      },
+      "TripInput": {
+        "type": "object",
+        "properties": {
+          "driverId": {
+            "type": "integer"
+          },
+          "vehicleId": {
+            "type": "integer"
+          },
+          "initialKm": {
+            "type": "number"
+          },
+          "finalKm": {
+            "type": "number"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          },
+          "companions": {
+            "type": "string"
+          },
+          "refueled": {
+            "type": "boolean"
+          },
+          "liters": {
+            "type": "number"
+          },
+          "fuelCost": {
+            "type": "number"
+          },
+          "observations": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "driverId",
+          "vehicleId",
+          "initialKm",
+          "finalKm",
+          "origin",
+          "destination",
+          "refueled"
+        ]
+      },
+      "MaintenanceInput": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          },
+          "km": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "cost": {
+            "type": "number"
+          },
+          "observations": {
+            "type": "string"
+          },
+          "nextMaintenanceKm": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "vehicleId",
+          "date",
+          "km",
+          "type",
+          "description",
+          "cost",
+          "observations",
+          "nextMaintenanceKm"
+        ]
+      },
+      "LoginInput": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "driver"
+            ]
+          },
+          "driverId": {
+            "type": "integer"
+          },
+          "pin": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "pin"
+        ]
+      },
+      "SetupInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "pin": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "pin",
+          "email"
+        ]
+      },
+      "SettingsInput": {
+        "type": "object",
+        "properties": {
+          "adminEmail": {
+            "type": "string"
+          },
+          "senderEmail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "adminEmail",
+          "senderEmail"
+        ]
+      },
+      "CorrectionInput": {
+        "type": "object",
+        "properties": {
+          "trip": {
+            "$ref": "#/components/schemas/TripInput"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "trip",
+          "reason"
+        ]
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
+          },
+          "setupRequired": {
+            "type": "boolean"
+          },
+          "role": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "driverId": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "authenticated",
+          "setupRequired"
+        ]
+      },
+      "Result": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "Driver": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "active"
+        ]
+      },
+      "Audit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "at": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "before": {
+            "type": "string"
+          },
+          "after": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "actor",
+          "action",
+          "reason",
+          "before",
+          "after"
+        ]
+      },
+      "FuelSummary": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "integer"
+          },
+          "plate": {
+            "type": "string"
+          },
+          "liters": {
+            "type": "number"
+          },
+          "cost": {
+            "type": "number"
+          },
+          "loads": {
+            "type": "integer"
+          },
+          "averageLiters": {
+            "type": "number"
+          },
+          "distance": {
+            "type": "number"
+          },
+          "kmPerLiter": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "vehicleId",
+          "plate",
+          "liters",
+          "cost",
+          "loads",
+          "averageLiters",
+          "distance",
+          "kmPerLiter"
+        ]
+      },
+      "Settings": {
+        "type": "object",
+        "properties": {
+          "adminEmail": {
+            "type": "string"
+          },
+          "senderEmail": {
+            "type": "string"
+          },
+          "emailConnected": {
+            "type": "boolean"
+          },
+          "pendingAlerts": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "adminEmail",
+          "senderEmail",
+          "emailConnected",
+          "pendingAlerts"
+        ]
+      },
+      "Vehicle": {
+        "type": "object",
+        "properties": {
+          "plate": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "currentKm": {
+            "type": "number"
+          },
+          "lastMaintenanceKm": {
+            "type": "number"
+          },
+          "maintenanceInterval": {
+            "type": "number"
+          },
+          "nextMaintenanceKm": {
+            "type": "number"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "warning",
+              "urgent",
+              "overdue"
+            ]
+          },
+          "remainingKm": {
+            "type": "number"
+          },
+          "lastDriver": {
+            "type": "string"
+          },
+          "lastRecord": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "plate",
+          "brand",
+          "model",
+          "year",
+          "currentKm",
+          "lastMaintenanceKm",
+          "maintenanceInterval",
+          "nextMaintenanceKm",
+          "active",
+          "id",
+          "status",
+          "remainingKm",
+          "lastDriver",
+          "lastRecord"
+        ]
+      },
+      "Trip": {
+        "type": "object",
+        "properties": {
+          "driverId": {
+            "type": "integer"
+          },
+          "vehicleId": {
+            "type": "integer"
+          },
+          "initialKm": {
+            "type": "number"
+          },
+          "finalKm": {
+            "type": "number"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          },
+          "companions": {
+            "type": "string"
+          },
+          "refueled": {
+            "type": "boolean"
+          },
+          "liters": {
+            "type": "number"
+          },
+          "fuelCost": {
+            "type": "number"
+          },
+          "observations": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "at": {
+            "type": "string"
+          },
+          "driverName": {
+            "type": "string"
+          },
+          "plate": {
+            "type": "string"
+          },
+          "distance": {
+            "type": "number"
+          },
+          "corrected": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "driverId",
+          "vehicleId",
+          "initialKm",
+          "finalKm",
+          "origin",
+          "destination",
+          "companions",
+          "refueled",
+          "liters",
+          "fuelCost",
+          "observations",
+          "id",
+          "at",
+          "driverName",
+          "plate",
+          "distance",
+          "corrected"
+        ]
+      },
+      "Maintenance": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string"
+          },
+          "km": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "cost": {
+            "type": "number"
+          },
+          "observations": {
+            "type": "string"
+          },
+          "nextMaintenanceKm": {
+            "type": "number"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "plate": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "vehicleId",
+          "date",
+          "km",
+          "type",
+          "description",
+          "cost",
+          "observations",
+          "nextMaintenanceKm",
+          "id",
+          "plate",
+          "actor"
+        ]
+      },
+      "Dashboard": {
+        "type": "object",
+        "properties": {
+          "vehicles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vehicle"
+            }
+          },
+          "recentTrips": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trip"
+            }
+          },
+          "totalTrips": {
+            "type": "integer"
+          },
+          "totalDistance": {
+            "type": "number"
+          },
+          "fuelCost": {
+            "type": "number"
+          },
+          "activeDrivers": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "vehicles",
+          "recentTrips",
+          "totalTrips",
+          "totalDistance",
+          "fuelCost",
+          "activeDrivers"
+        ]
+      }
+    }
+  }
+}
