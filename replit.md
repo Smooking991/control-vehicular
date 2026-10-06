@@ -37,11 +37,12 @@ Bitácora interna para una institución pública en Chile. Priorizar sencillez, 
 
 ## Product
 
-Viajes con fecha automática, validación de kilometraje, combustible, acompañantes y observaciones; administración de vehículos y conductores, mantenciones, historial con filtros, correcciones auditadas y resúmenes de combustible. Costos CLP, fechas America/Santiago.
+Viajes con fecha automática, validación de kilometraje, combustible, acompañantes y observaciones; administración de vehículos y conductores, mantenciones, historial con filtros, correcciones auditadas y resúmenes de combustible. Costos CLP, fechas America/Santiago. Exportaciones CSV compatibles con Excel para viajes, combustible, mantenciones y kilometraje; los filtros actuales se aplican a las exportaciones.
 
 ## User preferences
 
 Mantener `vercel.json` en la raíz desde el principio con exactamente framework `vite`, outputDirectory `dist/public` y una única regla source `/(.*)` hacia `/index.html`.
+No agregar funcionalidades ajenas al control vehicular. Priorizar una versión funcional y comprobar el flujo completo antes de mejoras de diseño. La aplicación debe funcionar en Android, computador y tablet.
 
 ## Gotchas
 

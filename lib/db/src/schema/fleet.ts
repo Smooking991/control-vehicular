@@ -1,4 +1,4 @@
-import { pgTable, serial, text, jsonb, timestamp, integer, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, jsonb, timestamp, integer, uniqueIndex, doublePrecision } from "drizzle-orm/pg-core";
 
 // Versioned domain payloads preserve the exact submitted data for auditability.
 export const fleetVehicles = pgTable("fleet_vehicles", {
@@ -22,6 +22,12 @@ export const fleetMaintenances = pgTable("fleet_maintenances", {
   id: serial("id").primaryKey(),
   vehicleId: integer("vehicle_id").notNull().references(() => fleetVehicles.id),
   data: jsonb("data").notNull(),
+});
+export const fleetFuelRecords = pgTable("fleet_fuel_records", {
+  id: serial("id").primaryKey(),
+  tripId: integer("trip_id").notNull().unique().references(() => fleetTrips.id),
+  liters: doublePrecision("liters").notNull(),
+  cost: doublePrecision("cost").notNull(),
 });
 export const fleetAdmin = pgTable("fleet_admin", {
   id: integer("id").primaryKey(),

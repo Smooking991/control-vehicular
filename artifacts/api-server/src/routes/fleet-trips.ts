@@ -4,6 +4,15 @@ import { q,transaction,requireAuth,requireAdmin,required,nonnegative,fail,mapTri
 
 export const tripsRouter=Router();
 tripsRouter.use(requireAuth);
+async function syncFuel(c: Client, tripId: number, data: any) {
+  if (data.refueled) {
+    await c.query(`INSERT INTO fleet_fuel_records(trip_id,liters,cost) VALUES($1,$2,$3)
+      ON CONFLICT(trip_id) DO UPDATE SET liters=EXCLUDED.liters,cost=EXCLUDED.cost`,
+    [tripId,data.liters,data.fuelCost]);
+  } else {
+    await c.query("DELETE FROM fleet_fuel_records WHERE trip_id=$1",[tripId]);
+  }
+}
 async function validateTrip(c:Client,input:any,correction=false){
   required(input.origin,input.destination);
   nonnegative(input.initialKm,input.finalKm);
@@ -28,6 +37,7 @@ tripsRouter.post("/trips",async(req,res)=>{
   res.json(await transaction(async c=>{
     const {v,data}=await validateTrip(c,input);
     const row=(await c.query("INSERT INTO fleet_trips(vehicle_id,driver_id,data) VALUES($1,$2,$3) RETURNING *",[input.vehicleId,input.driverId,data])).rows[0];
+    await syncFuel(c,row.id,data);
     const next={...v.data,currentKm:input.finalKm};
     await c.query("UPDATE fleet_vehicles SET data=$1 WHERE id=$2",[next,v.id]);
     await maybeAlert(c,{...next,id:v.id});
@@ -48,6 +58,7 @@ tripsRouter.put("/trips/:id",requireAdmin,async(req,res)=>{
     if(input.trip.initialKm<(before?.data.finalKm ?? v.data.baselineKm))fail("La corrección contradice el kilometraje anterior del vehículo.");
     if(after&&input.trip.finalKm>after.data.initialKm)fail("La corrección supera el kilometraje inicial del viaje siguiente.");
     const row=(await c.query("UPDATE fleet_trips SET vehicle_id=$1,driver_id=$2,data=$3 WHERE id=$4 RETURNING *",[v.id,input.trip.driverId,data,old.id])).rows[0];
+    await syncFuel(c,row.id,data);
     for(const vehicleId of new Set<number>([old.vehicle_id,v.id])){
       const vr=(await c.query("SELECT * FROM fleet_vehicles WHERE id=$1",[vehicleId])).rows[0];
       const last=(await c.query("SELECT data FROM fleet_trips WHERE vehicle_id=$1 ORDER BY at DESC,id DESC LIMIT 1",[vehicleId])).rows[0];
@@ -77,12 +88,14 @@ export async function filteredTrips(query:Record<string,unknown>){
 tripsRouter.get("/trips",requireAdmin,async(req,res)=>{res.json(await filteredTrips(req.query));});
 tripsRouter.get("/fuel",requireAdmin,async(req,res)=>{
   const trips=await filteredTrips(req.query);
+  const records=(await q.query("SELECT trip_id,liters,cost FROM fleet_fuel_records WHERE trip_id=ANY($1::integer[])",[trips.map(t=>t.id)])).rows;
+  const byTrip=new Map(records.map(r=>[r.trip_id,r]));
   const fleet=await vehicles();
   res.json(fleet.filter(v=>!req.query.vehicleId||String(v.id)===req.query.vehicleId).map(v=>{
     const all=trips.filter(t=>t.vehicleId===v.id);
-    const fills=all.filter(t=>t.refueled);
+    const fills=all.flatMap(t=>byTrip.has(t.id)?[byTrip.get(t.id)!]:[]);
     const liters=fills.reduce((sum,t)=>sum+t.liters,0);
-    const cost=fills.reduce((sum,t)=>sum+t.fuelCost,0);
+    const cost=fills.reduce((sum,t)=>sum+t.cost,0);
     const distance=all.reduce((sum,t)=>sum+t.distance,0);
     return {vehicleId:v.id,plate:v.plate,liters,cost,loads:fills.length,averageLiters:fills.length?liters/fills.length:0,distance,kmPerLiter:liters?distance/liters:0};
   }));

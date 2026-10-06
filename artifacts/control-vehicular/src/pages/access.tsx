@@ -52,9 +52,10 @@ export default function AccessPage({ session }: { session: Session }) {
 function useOnSession() {
   const qc = useQueryClient();
   const [, nav] = useLocation();
-  return (s: Session) => {
+  return async (s: Session) => {
+    // A pre-login session request must not overwrite the successful login.
+    await qc.cancelQueries({ queryKey: getGetSessionQueryKey() });
     qc.setQueryData(getGetSessionQueryKey(), s);
-    qc.invalidateQueries({ queryKey: getGetSessionQueryKey() });
     nav(s.role === "driver" ? "/viajes/nuevo" : "/");
   };
 }

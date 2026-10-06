@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PageHeader, Field, ErrorState, EmptyState, TableSkeleton, StatusBadge, Panel } from "@/components/kit";
+import { ExportCsv } from "@/components/export-csv";
 import { useToast } from "@/hooks/use-toast";
 import { errMsg, fmtKm, toNum } from "@/lib/fmt";
 
@@ -115,7 +116,8 @@ export default function Vehicles() {
   return (
     <div>
       <PageHeader eyebrow="Flota" title="Vehículos" desc="Desactive en vez de eliminar: el historial se conserva."
-        actions={<Button data-testid="button-new-vehicle" onClick={() => setDialog({})}><Plus className="mr-1.5 h-4 w-4" />Nuevo vehículo</Button>} />
+        actions={<div className="flex flex-wrap gap-2"><ExportCsv name="kilometraje" label="Exportar kilometraje" disabled={q.isFetching || q.isError} headers={["Patente","Marca","Modelo","Año","Km actual","Última mantención km","Próxima mantención km","Intervalo km","Km restantes","Estado","Activo","Último conductor","Último registro"]}
+          rows={(q.data??[]).map(v=>[v.plate,v.brand,v.model,v.year,v.currentKm,v.lastMaintenanceKm,v.nextMaintenanceKm,v.maintenanceInterval,v.remainingKm,v.status,v.active?"Sí":"No",v.lastDriver,v.lastRecord])} /><Button data-testid="button-new-vehicle" onClick={() => setDialog({})}><Plus className="mr-1.5 h-4 w-4" />Nuevo vehículo</Button></div>} />
       {q.isLoading ? <TableSkeleton /> : q.isError ? <ErrorState message={errMsg(q.error)} onRetry={() => q.refetch()} /> : list.length === 0 ? (
         <EmptyState icon={<Car className="h-5 w-5" />} title="La flota está vacía" desc="Registre el primer vehículo con su kilometraje actual para comenzar a recibir viajes." action={<Button onClick={() => setDialog({})}><Plus className="mr-1.5 h-4 w-4" />Registrar vehículo</Button>} />
       ) : (

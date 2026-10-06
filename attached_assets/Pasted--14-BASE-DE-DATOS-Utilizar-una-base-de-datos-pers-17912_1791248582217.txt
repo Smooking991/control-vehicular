@@ -1,0 +1,125 @@
+========================
+14. BASE DE DATOS
+========================
+
+Utilizar una base de datos persistente.
+
+Crear como mínimo estas tablas:
+
+users/conductors
+vehicles
+trips
+fuel_records
+maintenance
+alerts
+audit_log
+
+Las relaciones deben estar correctamente diseñadas.
+
+No utilizar datos ficticios como solución final. Puedes utilizar datos de prueba inicialmente, pero deja claramente preparado el sistema para ingresar los datos reales.
+
+========================
+15. DISEÑO
+========================
+
+El diseño debe ser profesional, sobrio y apropiado para una institución pública.
+
+Debe funcionar perfectamente en:
+
+- Android
+- Computador
+- Tablet
+
+Priorizar teléfonos porque los conductores utilizarán principalmente celulares.
+
+La pantalla del conductor debe ser muy sencilla y tener botones grandes.
+
+Utilizar tarjetas, tablas y colores de alerta.
+
+No sobrecargar la pantalla con información innecesaria.
+
+========================
+16. EXPORTACIÓN
+========================
+
+Administración debe poder exportar el historial a Excel/CSV.
+
+Idealmente permitir exportar:
+
+- Historial de viajes
+- Combustible
+- Mantenciones
+- Kilometraje
+
+========================
+17. SEGURIDAD
+========================
+
+Aunque sea un sistema interno, aplicar buenas prácticas:
+
+- Contraseñas/PIN almacenados de forma segura.
+- Validación de datos en frontend y backend.
+- No permitir que conductores accedan al panel administrativo.
+- No permitir eliminar registros de viajes desde la cuenta del conductor.
+- Proteger las rutas administrativas.
+
+========================
+18. TECNOLOGÍA
+========================
+
+Puedes utilizar una arquitectura moderna y sencilla, por ejemplo:
+
+Frontend:
+React / Next.js
+
+Backend:
+Node.js
+
+Base de datos:
+PostgreSQL
+
+Diseño:
+Tailwind CSS
+
+La aplicación debe quedar preparada para ejecutarse completamente desde Replit.
+
+NO quiero una maqueta estática.
+
+Quiero una aplicación FUNCIONAL con:
+
+- Base de datos
+- Formularios
+- Validaciones
+- Login
+- Dashboard
+- Historial
+- Alertas
+- Mantenciones
+- Control de combustible
+- Exportación
+- Persistencia de datos
+
+========================
+19. IMPORTANTE
+========================
+
+Antes de terminar, prueba el flujo completo:
+
+1. Crear conductor.
+2. Crear vehículo.
+3. Registrar viaje.
+4. Registrar kilometraje.
+5. Registrar combustible.
+6. Verificar que el kilometraje del vehículo se actualice.
+7. Verificar las alertas de mantención.
+8. Entrar como administrador.
+9. Ver historial.
+10. Filtrar información.
+11. Registrar una mantención.
+12. Verificar que cambie la próxima mantención.
+13. Probar los errores de kilometraje.
+14. Probar que un conductor no pueda acceder a Administración.
+
+Construye primero una versión funcional completa y luego mejora el diseño.
+
+No agregues funcionalidades innecesarias que no estén relacionadas con el control vehicular.

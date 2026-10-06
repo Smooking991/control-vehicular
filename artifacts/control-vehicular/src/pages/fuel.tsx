@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ExportCsv } from "@/components/export-csv";
 import { useGetFuelSummary, getGetFuelSummaryQueryKey } from "@workspace/api-client-react";
 import { Fuel, Info } from "lucide-react";
 import { PageHeader, ErrorState, EmptyState, TableSkeleton, Panel } from "@/components/kit";
@@ -14,7 +15,9 @@ export default function FuelPage() {
   const max = Math.max(1, ...rows.map((r) => r.cost));
   return (
     <div>
-      <PageHeader eyebrow="Consumo" title="Combustible por período" desc="Totales por vehículo según los viajes registrados en el rango seleccionado." />
+      <PageHeader eyebrow="Consumo" title="Combustible por período" desc="Totales por vehículo según los viajes registrados en el rango seleccionado."
+        actions={<ExportCsv name="combustible" disabled={q.isFetching || q.isError} headers={["Patente","Litros","Costo CLP","Cantidad de cargas","Promedio litros/carga","Km recorridos","Km/litro aproximados","Desde","Hasta"]}
+          rows={rows.map(r=>[r.plate,r.liters,r.cost,r.loads,r.averageLiters,r.distance,r.kmPerLiter,f.from,f.to])} />} />
       <FilterBar f={f} setF={setF} showRefuel={false} />
       <div className="mb-4 flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 p-3 text-xs text-primary">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />El rendimiento (km/L) es aproximado: divide la distancia recorrida en el período por los litros cargados, sin considerar el nivel del estanque al inicio ni al cierre.

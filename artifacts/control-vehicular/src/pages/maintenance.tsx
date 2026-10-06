@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PageHeader, Field, NativeSelect, ErrorState, EmptyState, TableSkeleton } from "@/components/kit";
+import { ExportCsv } from "@/components/export-csv";
 import { useToast } from "@/hooks/use-toast";
 import { errMsg, fmtCLP, fmtDate, fmtKm, todayISO, toNum } from "@/lib/fmt";
 
@@ -92,7 +93,8 @@ export default function Maintenance() {
   return (
     <div>
       <PageHeader eyebrow="Taller" title="Mantenciones" desc="Registro de trabajos realizados y próximo hito por vehículo."
-        actions={<Button data-testid="button-new-maintenance" disabled={vehiclesCount === 0} onClick={() => setOpen(true)}><Plus className="mr-1.5 h-4 w-4" />Registrar mantención</Button>} />
+        actions={<div className="flex flex-wrap gap-2"><ExportCsv name="mantenciones" disabled={q.isFetching || q.isError} headers={["ID","Patente","Fecha","Kilometraje","Tipo","Descripción","Costo CLP","Observaciones","Próxima mantención km","Responsable"]}
+          rows={(q.data??[]).map(m=>[m.id,m.plate,m.date,m.km,m.type,m.description,m.cost,m.observations,m.nextMaintenanceKm,m.actor])} /><Button data-testid="button-new-maintenance" disabled={vehiclesCount === 0} onClick={() => setOpen(true)}><Plus className="mr-1.5 h-4 w-4" />Registrar mantención</Button></div>} />
       {q.isLoading ? <TableSkeleton /> : q.isError ? <ErrorState message={errMsg(q.error)} onRetry={() => q.refetch()} /> : list.length === 0 ? (
         <EmptyState icon={<Wrench className="h-5 w-5" />} title="Sin mantenciones registradas" desc={vehiclesCount === 0 ? "Primero registre vehículos en la sección Vehículos." : "Registre la última mantención de cada vehículo para calcular las alertas."} action={vehiclesCount > 0 ? <Button onClick={() => setOpen(true)}><Plus className="mr-1.5 h-4 w-4" />Registrar mantención</Button> : undefined} />
       ) : (

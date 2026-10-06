@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { ExportCsv } from "@/components/export-csv";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListTrips, useListVehicles, useListDrivers, useCorrectTrip,
@@ -123,7 +124,9 @@ export default function History() {
 
   return (
     <div>
-      <PageHeader eyebrow="Bitácora" title="Historial de viajes" desc="Consulte todos los registros y corrija errores con motivo trazable." />
+      <PageHeader eyebrow="Bitácora" title="Historial de viajes" desc="Consulte todos los registros y corrija errores con motivo trazable."
+        actions={<ExportCsv name="viajes" disabled={q.isFetching || q.isError} headers={["ID","Fecha/hora Chile","Conductor","Patente","Km inicial","Km final","Km recorridos","Inicio","Destino","Acompañantes","Carga combustible","Litros","Costo CLP","Observaciones","Corregido"]}
+          rows={trips.map(t=>[t.id,fmtDateTime(t.at),t.driverName,t.plate,t.initialKm,t.finalKm,t.distance,t.origin,t.destination,t.companions,t.refueled?"Sí":"No",t.liters,t.fuelCost,t.observations,t.corrected?"Sí":"No"])} />} />
       <FilterBar f={f} setF={setF} />
       {q.isLoading ? <TableSkeleton /> : q.isError ? <ErrorState message={errMsg(q.error)} onRetry={() => q.refetch()} /> : trips.length === 0 ? (
         <EmptyState icon={<ClipboardList className="h-5 w-5" />} title={Object.values(f).some(Boolean) ? "Sin resultados para estos filtros" : "Aún no hay viajes registrados"} desc={Object.values(f).some(Boolean) ? "Pruebe ampliando el rango de fechas o quitando filtros." : "Cuando los conductores registren viajes, aparecerán aquí."} />
