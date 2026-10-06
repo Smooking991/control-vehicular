@@ -24,8 +24,9 @@ export async function transaction<T>(fn: (client: Client) => Promise<T>): Promis
   } finally { c.release(); }
 }
 const scryptAsync = promisify(scrypt);
-export async function hashPin(pin: string) {
-  if (!/^\d{6,12}$/.test(pin)) fail("El PIN debe tener entre 6 y 12 dígitos.");
+export async function hashPin(pin: string, role: "admin" | "driver" = "admin") {
+  if (!(role === "driver" ? /^\d{4}$/ : /^\d{6,12}$/).test(pin))
+    fail(role === "driver" ? "El PIN del conductor debe tener exactamente 4 dígitos." : "El PIN debe tener entre 6 y 12 dígitos.");
   const salt = randomBytes(16).toString("hex");
   const derived = await scryptAsync(pin, salt, 64) as Buffer;
   return `${salt}:${derived.toString("hex")}`;

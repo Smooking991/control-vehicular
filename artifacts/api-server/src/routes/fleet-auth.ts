@@ -32,6 +32,7 @@ authRouter.post("/login", async (req,res) => {
     ON CONFLICT(key) DO UPDATE SET attempts=CASE WHEN fleet_login_attempts.reset_at<now() THEN 1 ELSE fleet_login_attempts.attempts+1 END,
     reset_at=CASE WHEN fleet_login_attempts.reset_at<now() THEN now()+interval '15 minutes' ELSE fleet_login_attempts.reset_at END RETURNING attempts`,[key]);
   if (limit.rows[0].attempts>8) fail("Demasiados intentos. Espera 15 minutos.",429);
+  if(input.role==="driver"&&!/^\d{4}$/.test(input.pin))fail("El PIN del conductor debe tener exactamente 4 dígitos. Si usabas uno más largo, solicita uno nuevo a Administración.",400);
   const row = input.role==="admin"
     ? (await q.query("SELECT name,pin_hash FROM fleet_admin WHERE id=1")).rows[0]
     : (await q.query("SELECT data->>'name' AS name,pin_hash FROM fleet_drivers WHERE id=$1 AND (data->>'active')::boolean",[input.driverId || 0])).rows[0];

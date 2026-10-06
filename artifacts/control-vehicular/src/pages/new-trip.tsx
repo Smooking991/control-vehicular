@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetSession, useListVehicles, useListDrivers, useListPublicDrivers, useCreateTrip,
@@ -8,9 +8,10 @@ import {
 import { CheckCircle2, Loader2, Car, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ErrorState, EmptyState } from "@/components/kit";
 import { TripFields, emptyTrip, validateTrip, toTripInput, type TripForm } from "@/components/trip-fields";
-import { errMsg, fmtKm, nowSantiago, toNum } from "@/lib/fmt";
+import { errMsg, fmtKm, fmtCLP, nowSantiago, toNum } from "@/lib/fmt";
 
 export default function NewTrip() {
   const qc = useQueryClient();
@@ -26,6 +27,8 @@ export default function NewTrip() {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [tried, setTried] = useState(false);
   const [ok, setOk] = useState(false);
+  const [review, setReview] = useState<TripForm | null>(null);
+  const saving = useRef(false);
   const [clock, setClock] = useState(nowSantiago());
   useEffect(() => { const t = setInterval(() => setClock(nowSantiago()), 30_000); return () => clearInterval(t); }, []);
   useEffect(() => { if (ownId && !isAdmin) setF((p) => ({ ...p, driverId: ownId })); }, [ownId, isAdmin]);
@@ -57,14 +60,22 @@ export default function NewTrip() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault(); setTried(true);
-    if (!valid) return;
-    create.mutate({ data: toTripInput(f) }, {
+    if (!valid || saving.current) return;
+    create.reset();
+    setReview({ ...f });
+  };
+  const confirm = () => {
+    if (!review || saving.current) return;
+    saving.current = true;
+    create.mutate({ data: toTripInput(review) }, {
       onSuccess: () => {
+        setReview(null);
         setOk(true); setTried(false); setTouched(new Set());
         setF(emptyTrip(isAdmin ? "" : ownId));
         [getListVehiclesQueryKey(), getGetDashboardQueryKey(), getListTripsQueryKey(), getGetFuelSummaryQueryKey()].forEach((k) => qc.invalidateQueries({ queryKey: k }));
         window.scrollTo({ top: 0, behavior: "smooth" });
       },
+      onSettled: () => { saving.current = false; },
     });
   };
 
@@ -84,6 +95,39 @@ export default function NewTrip() {
           <CheckCircle2 className="h-5 w-5 shrink-0" />Viaje registrado correctamente
         </div>
       )}
+      <Dialog open={review !== null} onOpenChange={(open) => { if (!open && !saving.current) setReview(null); }}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto" onEscapeKeyDown={(e) => { if (saving.current) e.preventDefault(); }} onInteractOutside={(e) => { if (saving.current) e.preventDefault(); }}>
+          <DialogHeader>
+            <DialogTitle>¿Está correcto el viaje?</DialogTitle>
+            <DialogDescription>Revise el resumen. El viaje se guardará solo al confirmar.</DialogDescription>
+          </DialogHeader>
+          {review && <dl className="space-y-3 text-sm">
+            {[
+              ["Conductor", drivers.find(d => String(d.id) === review.driverId)?.name ?? session?.name],
+              ["Vehículo", vehicles.find(v => String(v.id) === review.vehicleId)?.plate],
+              ["Origen", review.origin.trim()],
+              ["Destino", review.destination.trim()],
+              ["Kilometraje inicial", fmtKm(toNum(review.initialKm))],
+              ["Kilometraje final", fmtKm(toNum(review.finalKm))],
+              ["Distancia recorrida", fmtKm(toNum(review.finalKm) - toNum(review.initialKm))],
+              ["Acompañantes", toTripInput(review).companions || "Sin acompañantes"],
+              ["Carga de combustible", review.refueled ? "Sí" : "No"],
+              ...(review.refueled ? [["Litros", review.liters], ["Costo", fmtCLP(toNum(review.fuelCost))]] : []),
+              ["Observaciones", review.observations.trim() || "Sin observaciones"],
+            ].map(([label, value]) => <div key={label} className="border-b border-border pb-2">
+              <dt className="text-muted-foreground">{label}</dt><dd className="break-words whitespace-pre-wrap font-semibold">{value}</dd>
+            </div>)}
+          </dl>}
+          <p className="text-xs text-muted-foreground">La fecha y hora se asignan automáticamente al guardar.</p>
+          {create.isError && <p role="alert" className="text-sm text-destructive">{errMsg(create.error)} Puede volver a corregir los datos.</p>}
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button type="button" variant="outline" className="h-12 flex-1" disabled={create.isPending} onClick={() => setReview(null)}>Volver a corregir</Button>
+            <Button data-testid="button-confirm-trip" type="button" className="h-12 flex-1" disabled={create.isPending} onClick={confirm}>
+              {create.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{create.isPending ? "Guardando…" : "Confirmar y guardar"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {loading ? (
         <div className="space-y-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-14" />)}</div>

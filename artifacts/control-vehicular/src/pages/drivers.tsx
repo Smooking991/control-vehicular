@@ -29,7 +29,7 @@ function DriverDialog({ driver, pinOnly, onClose }: { driver?: Driver; pinOnly?:
   const [tried, setTried] = useState(false);
   const pinRequired = !driver || pinOnly;
   const nameErr = !name.trim() ? "Ingrese el nombre." : "";
-  const pinErr = (pinRequired || pin) && !/^\d{6,12}$/.test(pin) ? "El PIN debe tener entre 6 y 12 dígitos." : "";
+  const pinErr = (pinRequired || pin) && !/^\d{4}$/.test(pin) ? "El PIN debe tener exactamente 4 dígitos." : "";
   const pending = create.isPending || update.isPending;
   const submit = (e: FormEvent) => {
     e.preventDefault(); setTried(true);
@@ -48,7 +48,7 @@ function DriverDialog({ driver, pinOnly, onClose }: { driver?: Driver; pinOnly?:
         <form onSubmit={submit} noValidate className="space-y-4">
           {!pinOnly && <Field label="Nombre completo" error={tried && nameErr}><Input data-testid="input-driver-name" value={name} onChange={(e) => setName(e.target.value)} /></Field>}
           <Field label={pinRequired ? "PIN" : "Nuevo PIN (opcional)"} error={tried && pinErr} hint={!pinRequired ? "Déjelo vacío para mantener el actual." : undefined}>
-            <Input data-testid="input-driver-pin" className="num tracking-[0.3em]" inputMode="numeric" type="password" autoComplete="new-password" value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} />
+            <Input data-testid="input-driver-pin" maxLength={4} className="num tracking-[0.3em]" inputMode="numeric" type="password" autoComplete="new-password" value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} />
           </Field>
           {!pinOnly && (
             <label className="flex items-center justify-between rounded-md border border-border p-3">

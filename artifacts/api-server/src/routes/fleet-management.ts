@@ -42,8 +42,8 @@ for(const method of ["post","put"] as const){
   managementRouter[method](method==="post"?"/drivers":"/drivers/:id",requireAdmin,async(req,res)=>{
     const input=(method==="post"?CreateDriverBody:UpdateDriverBody).parse(req.body);
     required(input.name);
-    const hash=input.pin?await hashPin(input.pin):null;
-    if(method==="post"&&!hash)fail("Asigna un PIN de 6 a 12 dígitos.");
+    const hash=input.pin?await hashPin(input.pin,"driver"):null;
+    if(method==="post"&&!hash)fail("Asigna un PIN de exactamente 4 dígitos.");
     res.json(await transaction(async c=>{
       const old=method==="put"?(await c.query("SELECT * FROM fleet_drivers WHERE id=$1",[Number(req.params.id)])).rows[0]:null;
       if(method==="put"&&!old)fail("Conductor no encontrado.",404);

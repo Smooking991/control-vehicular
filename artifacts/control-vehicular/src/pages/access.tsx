@@ -109,7 +109,7 @@ function LoginForm() {
   const [pin, setPin] = useState("");
   const drivers = useListPublicDrivers({ query: { queryKey: getListPublicDriversQueryKey(), enabled: role === "driver" } });
   const active = (drivers.data ?? []).filter((d) => d.active);
-  const canSubmit = pin.length > 0 && (role === "admin" || !!driverId);
+  const canSubmit = role === "driver" ? /^\d{4}$/.test(pin) && !!driverId : /^\d{6,12}$/.test(pin);
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
@@ -138,8 +138,8 @@ function LoginForm() {
           </NativeSelect>
         </Field>
       )}
-      <Field label="PIN">
-        <Input data-testid="input-login-pin" type="password" inputMode={role === "driver" ? "numeric" : undefined} className="num h-12 text-lg tracking-[0.3em]" value={pin} onChange={(e) => setPin(e.target.value)} autoComplete="current-password" />
+      <Field label={role === "driver" ? "PIN de 4 dígitos" : "PIN"}>
+        <Input data-testid="input-login-pin" type="password" maxLength={role === "driver" ? 4 : 12} inputMode="numeric" className="num h-12 text-lg tracking-[0.3em]" value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} autoComplete="current-password" />
       </Field>
       {login.isError && <p data-testid="text-login-error" className="rounded-sm border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{errMsg(login.error)}</p>}
       <Button data-testid="button-login" type="submit" className="h-12 w-full text-base font-bold" disabled={!canSubmit || login.isPending}>

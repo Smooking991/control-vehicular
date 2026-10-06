@@ -48,7 +48,8 @@ No agregar funcionalidades ajenas al control vehicular. Priorizar una versión f
 
 - La configuración Vercel solicitada cubre SOLO la SPA. No despliega el servidor Express, PostgreSQL ni el proceso periódico de correo. No prometer que copiar solo `dist/public` habilita la aplicación completa. Un despliegue fuera de Replit requiere alojar también API y base de datos y conservar `/api` bajo el mismo origen.
 - Resend requiere conexión autorizada y remitente verificado; configurar remitente y destinatario en Administración. Sin conexión los avisos permanecen pendientes, nunca se marcan enviados.
-- PIN de 6 a 12 dígitos; no almacenar ni documentar PIN en texto plano.
+- PIN del conductor de exactamente 4 dígitos; Administración mantiene 6 a 12 dígitos. No almacenar ni documentar PIN en texto plano. Los PIN anteriores de conductores requieren reasignación administrativa: los hashes no pueden convertirse ni truncarse.
+- Antes de guardar un viaje, mostrar un resumen y permitir confirmar o volver a corregir sin perder datos.
 - Completar la configuración inicial antes de compartir la URL: el primer administrador reclama la instancia. No dejar la pantalla de configuración inicial expuesta públicamente.
 - Una notificación que agota reintentos queda `failed` para revisión operativa, sin reenvío automático fuera de la ventana de idempotencia.
 
